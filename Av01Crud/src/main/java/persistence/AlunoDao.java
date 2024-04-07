@@ -24,7 +24,7 @@ public class AlunoDao implements ICrud<Aluno>, IAlunoDao {
     @Override
     public void inserir(Aluno a) throws SQLException, ClassNotFoundException {
         Connection c = gDao.getConnection();
-        String sql = "INSERT INTO Aluno VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Aluno VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement ps = c.prepareStatement(sql);
         ps.setLong(1, a.getRa());
         ps.setString(2, a.getCpf());
@@ -33,16 +33,15 @@ public class AlunoDao implements ICrud<Aluno>, IAlunoDao {
         ps.setString(5, a.getData_nascimento());
         ps.setString(6, a.getEmail_pessoal());
         ps.setString(7, a.getEmail_corporativo());
-        ps.setString(8, a.getTelefone());
-        ps.setString(9, a.getConclusao_segundo_grau());
-        ps.setString(10, a.getInstituicao_conclusao());
-        ps.setFloat(11, (float) a.getPontuacao_vestibular());
-        ps.setInt(12, a.getPosicao_vestibular());
-        ps.setInt(13, a.getAno_ingresso());
-        ps.setInt(14, a.getAno_limite_graduacao());
-        ps.setInt(15, a.getSemestre_ingresso());
-        ps.setInt(16, a.getSemestre_limite_graduacao());
-        ps.setInt(17, a.getCurso().getCodigo());
+        ps.setString(8, a.getConclusao_segundo_grau());
+        ps.setString(9, a.getInstituicao_conclusao());
+        ps.setFloat(10, (float) a.getPontuacao_vestibular());
+        ps.setInt(11, a.getPosicao_vestibular());
+        ps.setInt(12, a.getAno_ingresso());
+        ps.setInt(13, a.getAno_limite_graduacao());
+        ps.setInt(14, a.getSemestre_ingresso());
+        ps.setInt(15, a.getSemestre_limite_graduacao());
+        ps.setInt(16, a.getCurso().getCodigo());
 
         ps.execute();
         ps.close();
@@ -53,7 +52,7 @@ public class AlunoDao implements ICrud<Aluno>, IAlunoDao {
     public void atualizar(Aluno a) throws SQLException, ClassNotFoundException {
         Connection c = gDao.getConnection();
         String sql = "UPDATE Aluno SET nome = ?, nome_social = ?, data_nascimento = ?, email_pessoal = ?, "
-                + "email_corporativo = ?, telefone = ?, conclusao_segundo_grau = ?, instituicao_conclusao = ?, pontuacao_vestibular = ?, "
+                + "email_corporativo = ?, conclusao_segundo_grau = ?, instituicao_conclusao = ?, pontuacao_vestibular = ?, "
                 + "posicao_vestibular = ?, ano_ingresso = ?, ano_limite_graduacao = ?, semestre_ingresso = ?, "
                 + "semestre_limite_graduacao = ?, curso = ? WHERE cpf = ?";
         PreparedStatement ps = c.prepareStatement(sql);
@@ -62,17 +61,16 @@ public class AlunoDao implements ICrud<Aluno>, IAlunoDao {
         ps.setString(3, a.getData_nascimento());
         ps.setString(4, a.getEmail_pessoal());
         ps.setString(5, a.getEmail_corporativo());
-        ps.setString(6, a.getTelefone());
-        ps.setString(7, a.getConclusao_segundo_grau());
-        ps.setString(8, a.getInstituicao_conclusao());
-        ps.setFloat(9, (float) a.getPontuacao_vestibular());
-        ps.setInt(10, a.getPosicao_vestibular());
-        ps.setInt(11, a.getAno_ingresso());
-        ps.setInt(12, a.getAno_limite_graduacao());
-        ps.setInt(13, a.getSemestre_ingresso());
-        ps.setInt(14, a.getSemestre_limite_graduacao());
-        ps.setInt(15, a.getCurso().getCodigo());
-        ps.setString(16, a.getCpf());
+        ps.setString(6, a.getConclusao_segundo_grau());
+        ps.setString(7, a.getInstituicao_conclusao());
+        ps.setFloat(8, (float) a.getPontuacao_vestibular());
+        ps.setInt(9, a.getPosicao_vestibular());
+        ps.setInt(10, a.getAno_ingresso());
+        ps.setInt(11, a.getAno_limite_graduacao());
+        ps.setInt(12, a.getSemestre_ingresso());
+        ps.setInt(13, a.getSemestre_limite_graduacao());
+        ps.setInt(14, a.getCurso().getCodigo());
+        ps.setString(15, a.getCpf());
 
         ps.execute();
         ps.close();
@@ -94,7 +92,7 @@ public class AlunoDao implements ICrud<Aluno>, IAlunoDao {
     @Override
     public Aluno consultar(Aluno a) throws SQLException, ClassNotFoundException {
         Connection c = gDao.getConnection();
-        String sql = "SELECT A.ra, A.cpf, A.nome, A.nome_social, A.data_nascimento, A.email_pessoal, A.email_corporativo, A.telefone, A.conclusao_segundo_grau, "
+        String sql = "SELECT A.ra, A.cpf, A.nome, A.nome_social, A.data_nascimento, A.email_pessoal, A.email_corporativo, A.conclusao_segundo_grau, "
                 + "A.instituicao_conclusao, A.pontuacao_vestibular, A.posicao_vestibular, A.ano_ingresso, A.ano_limite_graduacao, "
                 + "A.semestre_ingresso, A.semestre_limite_graduacao, A.curso AS codigoCurso, C.nome AS nomeCurso "
                 + "FROM Aluno A "
@@ -111,7 +109,6 @@ public class AlunoDao implements ICrud<Aluno>, IAlunoDao {
             a.setData_nascimento(rs.getString("data_nascimento"));
             a.setEmail_pessoal(rs.getString("email_pessoal"));
             a.setEmail_corporativo(rs.getString("email_corporativo"));
-            a.setTelefone(rs.getString("telefone"));
             a.setConclusao_segundo_grau(rs.getString("conclusao_segundo_grau"));
             a.setInstituicao_conclusao(rs.getString("instituicao_conclusao"));
             a.setPontuacao_vestibular(rs.getDouble("pontuacao_vestibular"));
@@ -137,7 +134,7 @@ public class AlunoDao implements ICrud<Aluno>, IAlunoDao {
     public List<Aluno> listar() throws SQLException, ClassNotFoundException {
         List<Aluno> alunos = new ArrayList<>();
         Connection c = gDao.getConnection();
-        String sql = "SELECT A.ra, A.cpf, A.nome, A.nome_social, A.data_nascimento, A.email_pessoal, A.email_corporativo, A.telefone, A.conclusao_segundo_grau, "
+        String sql = "SELECT A.ra, A.cpf, A.nome, A.nome_social, A.data_nascimento, A.email_pessoal, A.email_corporativo, A.conclusao_segundo_grau, "
                 + "A.instituicao_conclusao, A.pontuacao_vestibular, A.posicao_vestibular, A.ano_ingresso, A.ano_limite_graduacao, "
                 + "A.semestre_ingresso, A.semestre_limite_graduacao, A.curso AS codigoCurso, C.nome AS nomeCurso "
                 + "FROM Aluno A "
@@ -155,7 +152,6 @@ public class AlunoDao implements ICrud<Aluno>, IAlunoDao {
                 a.setData_nascimento(rs.getString("data_nascimento"));
                 a.setEmail_pessoal(rs.getString("email_pessoal"));
                 a.setEmail_corporativo(rs.getString("email_corporativo"));
-                a.setTelefone(rs.getString("telefone"));
                 a.setConclusao_segundo_grau(rs.getString("conclusao_segundo_grau"));
                 a.setInstituicao_conclusao(rs.getString("instituicao_conclusao"));
                 a.setPontuacao_vestibular(rs.getDouble("pontuacao_vestibular"));
@@ -180,7 +176,7 @@ public class AlunoDao implements ICrud<Aluno>, IAlunoDao {
     @Override
     public String iudAluno(String op, Aluno a) throws SQLException, ClassNotFoundException {
         Connection c = gDao.getConnection();
-        String sql = "CALL GerenciarMatricula(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        String sql = "CALL GerenciarMatricula(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         CallableStatement cs = c.prepareCall(sql);
         cs.setString(1, op);
         cs.setString(2, a.getCpf());
@@ -189,18 +185,17 @@ public class AlunoDao implements ICrud<Aluno>, IAlunoDao {
         cs.setString(5, a.getData_nascimento());
         cs.setString(6, a.getEmail_pessoal());
         cs.setString(7, a.getEmail_corporativo());
-        cs.setString(8, a.getTelefone());
-        cs.setString(9, a.getConclusao_segundo_grau());
-        cs.setString(10, a.getInstituicao_conclusao());
-        cs.setFloat(11, (float) a.getPontuacao_vestibular());
-        cs.setInt(12, a.getPosicao_vestibular());
-        cs.setInt(13, a.getAno_ingresso());
-        cs.setInt(14, a.getSemestre_ingresso());
-        cs.setInt(15, a.getSemestre_limite_graduacao());
-        cs.setInt(16, a.getCurso().getCodigo());
-        cs.registerOutParameter(17, Types.VARCHAR);
+        cs.setString(8, a.getConclusao_segundo_grau());
+        cs.setString(9, a.getInstituicao_conclusao());
+        cs.setFloat(10, (float) a.getPontuacao_vestibular());
+        cs.setInt(11, a.getPosicao_vestibular());
+        cs.setInt(12, a.getAno_ingresso());
+        cs.setInt(13, a.getSemestre_ingresso());
+        cs.setInt(14, a.getSemestre_limite_graduacao());
+        cs.setInt(15, a.getCurso().getCodigo());
+        cs.registerOutParameter(16, Types.VARCHAR);
         cs.execute();
-        String saida = cs.getString(17);
+        String saida = cs.getString(16);
         cs.close();
         c.close();
         return saida;

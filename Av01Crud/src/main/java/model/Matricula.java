@@ -7,15 +7,25 @@ import lombok.Setter;
 @Setter
 public class Matricula {
 	
+	int codigo;
 	Aluno aluno;
 	Disciplina disciplina;
 	String data;
+	Status status;
 	
 	
 	@Override
 	public String toString() {
-		return "Matricula [aluno=" + aluno + ", disciplina=" + disciplina + ", data=" + data + "]";
+		return "Matricula [codigo=" + codigo + ", aluno=" + aluno + ", disciplina=" + disciplina + ", data=" + data
+				+ ", status=" + status + "]";
 	}
+	
+	
+	
+	
+	
+	
+	
 
 	
 	

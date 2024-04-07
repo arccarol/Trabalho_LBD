@@ -15,6 +15,14 @@
         <form action="matricula" method="post">
             <p class="title"><b class = "cadastrar">Realize a Matrícula</b></p>
             <table>
+            <tr>
+              <td class = "aluno">
+              <p class = "title">Codigo:</p>
+                <input class="cadastro" type="number" 
+                id="codigo" name="codigo" placeholder=""
+                value='<c:out value="${matricula.codigo }"></c:out>'>
+              </td>
+         </tr>
                 <tr>
                     <td class="aluno"><label for="curso">Aluno:</label></td>
                     <td>
@@ -43,6 +51,17 @@
                         <input class="cadastro" type="date" id="data_m" name="data_m" value='<c:out value="${matricula.data_m }"></c:out>'>
                     </td>
                 </tr>
+                <tr class="espaco">
+                    <td class="aluno"><label for="status">Status:</label></td>
+                    <td>
+                        <select class="input_data" id="status" name="status">
+                            <option value="">Selecione o Status</option>
+                            <c:forEach var="status" items="${statuss }">
+                                <option value="${status.nome}">${status.nome}</option>
+                            </c:forEach>
+                        </select>
+                    </td>
+                </tr>
                 <tr class="botoes">
                     <td><input type="submit" name="botao" value="Cadastrar"></td>
                     <td><input type="submit" name="botao" value="Alterar"></td>
@@ -69,17 +88,21 @@
                     <table class="table_round">
                         <thead>
                             <tr>
+                                <th>Codigo</th>
                                 <th>Aluno</th>
                                 <th>Disciplina</th>
                                 <th>Data Matrícula</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
                             <c:forEach var="matricula" items="${matriculas }">
                                 <tr>
+                                    <td><c:out value="${matricula.codigo}" /></td>
                                     <td><c:out value="${matricula.aluno.nome}" /></td>
                                     <td><c:out value="${matricula.disciplina.nome}" /></td>
                                     <td><c:out value="${matricula.data }" /></td>
+                                    <td><c:out value="${matricula.status.nome}" /></td>
                                 </tr>
                             </c:forEach>
                         </tbody>
@@ -143,6 +166,7 @@ input[type=submit]:hover {
  }
  
  .cadastro {
+    margin-top: 10px;
     background-color:#F5F5DC;
     border-radius: 20px; 
     outline: none;
@@ -161,7 +185,7 @@ form {
   margin-left: 30px;
   background-color:	#dcdcdc;
   width: 600px; 
-  height: 330px;
+  height: 430px;
   padding: 10px;
   border-radius: 30px; 
  }
@@ -236,11 +260,17 @@ select {
     background-color:#F5F5DC;
     border-radius: 20px; 
     outline: none;
-    padding: 0 0.6rem;
+    padding: 0 0.5rem;
     width: 200px; 
     height: 30px;
     border: 1px solid #C0C0C0; 
 
 }
+
+#status{
+margin-top: -10px;
+
+}
+
 </style>
 </html>

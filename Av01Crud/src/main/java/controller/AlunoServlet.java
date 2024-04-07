@@ -60,7 +60,6 @@ public class AlunoServlet extends HttpServlet {
 		String data_nascimento = request.getParameter("data_nascimento");
 		String email_pessoal = request.getParameter("email_pessoal");
 		String email_corporativo = request.getParameter("email_corporativo");
-		String telefone = request.getParameter("telefone");
 		String conclusao_segundo_grau = request.getParameter("conclusao_segundo_grau");
 		String instituicao_conclusao = request.getParameter("instituicao_conclusao");
 		String pontuacao_vestibular = request.getParameter("pontuacao_vestibular");
@@ -93,7 +92,6 @@ public class AlunoServlet extends HttpServlet {
 	    	 a.setData_nascimento(data_nascimento);
 	    	 a.setEmail_pessoal(email_pessoal);
 	    	 a.setEmail_corporativo(email_corporativo);
-	    	 a.setTelefone(telefone);
 	    	 a.setConclusao_segundo_grau(conclusao_segundo_grau);
 	    	 a.setInstituicao_conclusao(instituicao_conclusao);
 	    	 
@@ -117,18 +115,16 @@ public class AlunoServlet extends HttpServlet {
              a.setCurso(curso);
 		}
 			if (cmd.contains("Cadastrar")) {
-				cadastrarAluno(a);
-                saida = "Aluno cadastrada com sucesso";
+				saida = cadastrarAluno(a);
                 a = null;
 			}
 			if (cmd.contains("Alterar")) {
-				alterarAluno(a);
-                saida = "Aluno alterada com sucesso";
+				saida = alterarAluno(a);
                 a = null;
 			}
 			if (cmd.contains("Excluir")) {
 				excluirAluno(a);
-                saida = "Aluno excluída com sucesso";
+			    saida = "Aluno excluída com sucesso";
                 a = null;
 			}
 			if (cmd.contains("Buscar")) {

@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class Grade {
 	
+	int codigo;
 	Curso curso;
 	Disciplina disciplina;
 	

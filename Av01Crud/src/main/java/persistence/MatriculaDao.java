@@ -1,17 +1,20 @@
 package persistence;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
 import model.Aluno;
 import model.Disciplina;
 import model.Matricula;
+import model.Status;
 
-public class MatriculaDao implements ICrud<Matricula> {
+public class MatriculaDao implements ICrud<Matricula>, IMatriculaDao {
 
     private GenericDao gDao;
 
@@ -20,81 +23,140 @@ public class MatriculaDao implements ICrud<Matricula> {
     }
 
     @Override
-    public void inserir(Matricula m) throws SQLException, ClassNotFoundException {
-        String sql = "INSERT INTO Matricula (aluno, disciplina, data_m) VALUES (?, ?, ?)";
-        try (Connection c = gDao.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, m.getAluno().getCpf());
-            ps.setInt(2, m.getDisciplina().getCodigo());
-            ps.setString(3, m.getData());
-            ps.executeUpdate();
+    public String iudMatricula(String op, Matricula m) throws SQLException, ClassNotFoundException {
+        Connection cc = null;
+        CallableStatement cs = null;
+        try {
+            cc = gDao.getConnection();
+
+            String gerenciarMatriculaSql = "{CALL GerenciarMatriculaD(?, ?, ?, ?, ?, ?, ?)}";
+            cs = cc.prepareCall(gerenciarMatriculaSql);
+            cs.setString(1, op);
+            cs.setInt(2, m.getCodigo());
+            cs.setString(3, m.getAluno().getCpf());
+            cs.setInt(4, m.getDisciplina().getCodigo());
+            cs.setString(5, m.getData());
+            cs.setString(6, m.getStatus().getNome());
+            cs.registerOutParameter(7, Types.VARCHAR);
+            cs.execute();
+            
+            return cs.getString(7);
+        } finally {
+            if (cs != null) {
+                cs.close();
+            }
+            if (cc != null) {
+                cc.close();
+            }
         }
     }
+
+
+
+
+    @Override
+    public void inserir(Matricula m) throws SQLException, ClassNotFoundException {
+        Connection c = gDao.getConnection();
+        String sql = "INSERT INTO Matricula (codigo, aluno, disciplina, data_m, nome_status) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, m.getCodigo());
+            ps.setString(2, m.getAluno().getCpf());
+            ps.setInt(3, m.getDisciplina().getCodigo());
+            ps.setString(4, m.getData());
+            ps.setString(5, m.getStatus().getNome()); // Aqui está passando o nome do status
+            ps.execute();
+        }
+    }
+
 
     @Override
     public void atualizar(Matricula m) throws SQLException, ClassNotFoundException {
-        String sql = "UPDATE Matricula SET disciplina = ?, data_m = ? WHERE aluno = ?";
-        try (Connection c = gDao.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+        Connection c = gDao.getConnection();
+        String sql = "UPDATE Matricula SET disciplina = ?, data_m = ?, nome_status = ? WHERE codigo = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
             ps.setInt(1, m.getDisciplina().getCodigo());
             ps.setString(2, m.getData());
-            ps.setString(3, m.getAluno().getCpf());
-            ps.executeUpdate();
+            ps.setString(3, m.getStatus().getNome());
+            ps.setInt(4, m.getCodigo());
+            ps.execute();
         }
     }
 
+
     @Override
     public void excluir(Matricula m) throws SQLException, ClassNotFoundException {
-        String sql = "DELETE FROM Matricula WHERE aluno = ?";
-        try (Connection c = gDao.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, m.getAluno().getCpf());
-            ps.executeUpdate();
+        Connection c = gDao.getConnection();
+        String sql = "DELETE FROM Matricula WHERE codigo = ?";
+        try (PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setInt(1, m.getCodigo());
+            ps.execute();
         }
     }
 
     @Override
     public Matricula consultar(Matricula m) throws SQLException, ClassNotFoundException {
-        String sql = "SELECT m.aluno AS cpfAluno, m.disciplina AS codigoDisciplina, "
-                   + "a.nome AS nomeAluno, d.nome AS nomeDisciplina, m.data_m AS dataMatricula "
-                   + "FROM Matricula m "
-                   + "INNER JOIN aluno a ON a.cpf = m.aluno "
-                   + "INNER JOIN disciplina d ON d.codigo = m.disciplina "
-                   + "WHERE m.aluno = ?";
-        try (Connection c = gDao.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-            ps.setString(1, m.getAluno().getCpf());
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    Aluno a = new Aluno();
-                    a.setCpf(rs.getString("cpfAluno"));
-                    a.setNome(rs.getString("nomeAluno"));
+        Connection c = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
 
-                    Disciplina disciplina = new Disciplina();
-                    disciplina.setCodigo(rs.getInt("codigoDisciplina"));
-                    disciplina.setNome(rs.getString("nomeDisciplina"));
+        try {
+            c = gDao.getConnection();
+            String sql = "SELECT m.codigo AS codigo, m.aluno AS cpfAluno, m.disciplina AS codigoDisciplina, "
+                    + "a.nome AS nomeAluno, d.nome AS nomeDisciplina, m.data_m AS dataMatricula, m.nome_status AS status "
+                    + "FROM Matricula m "
+                    + "INNER JOIN aluno a ON a.cpf = m.aluno "
+                    + "INNER JOIN disciplina d ON d.codigo = m.disciplina "
+                    + "WHERE m.codigo = ?";
+            ps = c.prepareStatement(sql);
+            ps.setInt(1, m.getCodigo());
+            rs = ps.executeQuery();
 
-                    m.setData(rs.getString("dataMatricula"));
+            if (rs.next()) {
+                Aluno a = new Aluno();
+                a.setCpf(rs.getString("cpfAluno"));
+                a.setNome(rs.getString("nomeAluno"));
 
-                    m.setAluno(a);
-                    m.setDisciplina(disciplina);
-                }
+                Disciplina disciplina = new Disciplina();
+                disciplina.setCodigo(rs.getInt("codigoDisciplina"));
+                disciplina.setNome(rs.getString("nomeDisciplina"));
+                
+                m.setCodigo(rs.getInt("codigo"));
+                m.setData(rs.getString("dataMatricula"));
+                
+                Status s = new Status();
+                s.setNome(rs.getString("status"));
+
+                m.setAluno(a);
+                m.setStatus(s);
+                m.setDisciplina(disciplina);
+            }
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ps != null) {
+                ps.close();
+            }
+            if (c != null) {
+                c.close();
             }
         }
+
         return m;
     }
 
     @Override
     public List<Matricula> listar() throws SQLException, ClassNotFoundException {
         List<Matricula> matriculas = new ArrayList<>();
-        String sql = "SELECT m.aluno AS cpfAluno, m.disciplina AS codigoDisciplina, "
-                + "a.nome AS nomeAluno, d.nome AS nomeDisciplina, m.data_m AS dataMatricula "
-                + "FROM Matricula m "
-                + "INNER JOIN aluno a ON a.cpf = m.aluno "
-                + "INNER JOIN disciplina d ON d.codigo = m.disciplina ";
-        try (Connection c = gDao.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql);
+        Connection c = gDao.getConnection();
+        String sql = "SELECT m.codigo AS codigo, m.aluno AS cpfAluno, m.disciplina AS codigoDisciplina, "
+        		+ "a.nome AS nomeAluno, d.nome AS nomeDisciplina, m.data_m AS dataMatricula, m.nome_status AS status "
+        		+ "FROM Matricula m "
+        		+ "INNER JOIN aluno a ON a.cpf = m.aluno "
+        		+ "INNER JOIN disciplina d ON d.codigo = m.disciplina ";
+        try (PreparedStatement ps = c.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
                 Matricula m = new Matricula();
 
@@ -107,14 +169,19 @@ public class MatriculaDao implements ICrud<Matricula> {
                 disciplina.setNome(rs.getString("nomeDisciplina"));
 
                 m.setData(rs.getString("dataMatricula"));
+                m.setCodigo(rs.getInt("codigo"));
 
+                Status s = new Status();
+                s.setNome(rs.getString("status"));
+                
                 m.setAluno(a);
                 m.setDisciplina(disciplina);
+                m.setStatus(s);
 
                 matriculas.add(m);
             }
         }
+
         return matriculas;
     }
 }
-

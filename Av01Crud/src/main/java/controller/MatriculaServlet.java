@@ -1,6 +1,7 @@
 package controller;
 
 import jakarta.servlet.RequestDispatcher;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -9,10 +10,12 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.Aluno;
 import model.Disciplina;
 import model.Matricula;
+import model.Status;
 import persistence.GenericDao;
 import persistence.AlunoDao;
 import persistence.DisciplinaDao;
 import persistence.MatriculaDao;
+import persistence.StatusDao;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -36,10 +39,14 @@ public class MatriculaServlet extends HttpServlet {
 
         List<Disciplina> disciplinas = new ArrayList<>();
         DisciplinaDao disciplinaDao = new DisciplinaDao(gDao);
+        
+        List<Status> statuss = new ArrayList<>();
+        StatusDao statusDao = new StatusDao(gDao);
 
         try {
             alunos = alunoDao.listar();
             disciplinas = disciplinaDao.listar();
+            statuss = statusDao.listar();
 
         } catch (ClassNotFoundException | SQLException e) {
             erro = e.getMessage();
@@ -48,6 +55,7 @@ public class MatriculaServlet extends HttpServlet {
             request.setAttribute("erro", erro);
             request.setAttribute("alunos", alunos);
             request.setAttribute("disciplinas", disciplinas);
+            request.setAttribute("statuss", statuss);
 
             RequestDispatcher rd = request.getRequestDispatcher("matricula.jsp");
             rd.forward(request, response);
@@ -58,10 +66,12 @@ public class MatriculaServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         // entrada
-        String cmd = request.getParameter("botao");;
+        String cmd = request.getParameter("botao");
+        String codigo = request.getParameter("codigo");
         String alunoCpf = request.getParameter("aluno");
         String disciplinaCodigo = request.getParameter("disciplina");
         String data = request.getParameter("data_m");
+        String status = request.getParameter("status"); // Alteração aqui: mudança para "status"
 
         // saída
         String saida = "";
@@ -71,41 +81,45 @@ public class MatriculaServlet extends HttpServlet {
         List<Aluno> alunos = new ArrayList<>();
         List<Disciplina> disciplinas = new ArrayList<>();
         List<Matricula> matriculas = new ArrayList<>();
+        List<Status> statuss = new ArrayList<>();
 
         if (!cmd.contains("Listar")) {
-        	Aluno a = new Aluno();
-        	a.setCpf(alunoCpf);
-        	m.setAluno(a);
-
+            m.setCodigo(Integer.parseInt(codigo));
         }
 
         try {
             GenericDao gDao = new GenericDao();
             AlunoDao alunoDao = new AlunoDao(gDao);
+            StatusDao statusDao = new StatusDao(gDao);
 
             alunos = listarAluno();
             disciplinas = listarDisciplinas();
+            statuss = listarStatus();
 
             if (cmd.contains("Cadastrar") || cmd.contains("Alterar")) {
-            	Aluno a = new Aluno();
-            	a.setCpf(alunoCpf);
+                Aluno a = new Aluno();
+                a.setCpf(alunoCpf);
 
                 Disciplina disciplina = new Disciplina();
                 disciplina.setCodigo(Integer.parseInt(disciplinaCodigo));
+                
+                m.setCodigo(Integer.parseInt(codigo));
+                
+                Status s = new Status();
+                s.setNome(status);
 
                 m.setData(data);
                 m.setAluno(a);
                 m.setDisciplina(disciplina);
+                m.setStatus(s);
             }
 
             if (cmd.contains("Cadastrar")) {
-                cadastrarMatricula(m);
-                saida = "Matricula cadastrada com sucesso";
+                saida = cadastrarMatricula(m);
                 m = null;
             }
             if (cmd.contains("Alterar")) {
-                alterarMatricula(m);
-                saida = "Matricula alterada com sucesso";
+                saida = alterarMatricula(m);
                 m = null;
             }
             if (cmd.contains("Excluir")) {
@@ -130,57 +144,73 @@ public class MatriculaServlet extends HttpServlet {
             request.setAttribute("matriculas", matriculas);
             request.setAttribute("alunos", alunos);
             request.setAttribute("disciplinas", disciplinas);
+            request.setAttribute("statuss", statuss);
 
             RequestDispatcher rd = request.getRequestDispatcher("matricula.jsp");
             rd.forward(request, response);
         }
     }
 
-    // Métodos existentes mantidos sem alterações
 
-    private void cadastrarMatricula(Matricula m) throws SQLException, ClassNotFoundException {
-        GenericDao gDao = new GenericDao();
-        MatriculaDao matriculaDao = new MatriculaDao(gDao);
-        matriculaDao.inserir(m);
-    }
+  
 
-    private void alterarMatricula(Matricula m) throws SQLException, ClassNotFoundException {
-        GenericDao gDao = new GenericDao();
-        MatriculaDao matriculaDao = new MatriculaDao(gDao);
-        matriculaDao.atualizar(m);
-    }
+    private String cadastrarMatricula(Matricula m)throws SQLException, ClassNotFoundException {
+		 GenericDao gDao = new GenericDao();
+	        MatriculaDao pDao = new MatriculaDao(gDao);
+	        return pDao.iudMatricula("I", m);
+	}
 
-    private void excluirMatricula(Matricula m) throws SQLException, ClassNotFoundException {
-        GenericDao gDao = new GenericDao();
-        MatriculaDao matriculaDao = new MatriculaDao(gDao);
-        matriculaDao.excluir(m);
-    }
 
-    private Matricula buscarMatricula(Matricula m) throws SQLException, ClassNotFoundException {
-        GenericDao gDao = new GenericDao();
-        MatriculaDao matriculaDao = new MatriculaDao(gDao);
-        m = matriculaDao.consultar(m);
-        return m;
-    }
+	private String alterarMatricula(Matricula m)throws SQLException, ClassNotFoundException {
+		GenericDao gDao = new GenericDao();
+	    MatriculaDao pDao = new MatriculaDao(gDao);
+		String saida = pDao.iudMatricula("U", m);
+		return saida;
+	}
 
-    private List<Matricula> listarMatricula() throws SQLException, ClassNotFoundException {
-        GenericDao gDao = new GenericDao();
-        MatriculaDao matriculaDao = new MatriculaDao(gDao);
-        List<Matricula> matriculas = matriculaDao.listar();
-        return matriculas;
-    }
 
-    private List<Aluno> listarAluno() throws SQLException, ClassNotFoundException {
-        GenericDao gDao = new GenericDao();
-        AlunoDao alunoDao = new AlunoDao(gDao);
-        List<Aluno> alunos = alunoDao.listar();
-        return alunos;
-    }
+	private void excluirMatricula(Matricula m)throws SQLException, ClassNotFoundException {
+		GenericDao gDao = new GenericDao();
+		 MatriculaDao pDao = new MatriculaDao(gDao);
+		pDao.excluir(m);
+	}
 
-    private List<Disciplina> listarDisciplinas() throws SQLException, ClassNotFoundException {
-        GenericDao gDao = new GenericDao();
-        DisciplinaDao disciplinaDao = new DisciplinaDao(gDao);
-        List<Disciplina> disciplinas = disciplinaDao.listar();
-        return disciplinas;
-    }
+
+	private Matricula buscarMatricula(Matricula m)throws SQLException, ClassNotFoundException {
+		GenericDao gDao = new GenericDao();
+		 MatriculaDao pDao = new MatriculaDao(gDao);
+	    m = pDao.consultar(m);
+		return m;
+	}
+
+
+	private List<Matricula> listarMatricula() throws SQLException, ClassNotFoundException{
+		GenericDao gDao = new GenericDao();
+		MatriculaDao pDao = new MatriculaDao(gDao);
+	    List<Matricula> matriculas = pDao.listar();
+	    
+		 return matriculas;
+		 
+	}
+	
+	  private List<Aluno> listarAluno() throws SQLException, ClassNotFoundException {
+	        GenericDao gDao = new GenericDao();
+	        AlunoDao alunoDao = new AlunoDao(gDao);
+	        List<Aluno> alunos = alunoDao.listar();
+	        return alunos;
+	    }
+
+	    private List<Disciplina> listarDisciplinas() throws SQLException, ClassNotFoundException {
+	        GenericDao gDao = new GenericDao();
+	        DisciplinaDao disciplinaDao = new DisciplinaDao(gDao);
+	        List<Disciplina> disciplinas = disciplinaDao.listar();
+	        return disciplinas;
+	    }
+	    
+	    private List<Status> listarStatus() throws SQLException, ClassNotFoundException {
+	        GenericDao gDao = new GenericDao();
+	        StatusDao statusDao = new StatusDao(gDao);
+	        List<Status> statuss = statusDao.listar();
+	        return statuss;
+	    }
 }

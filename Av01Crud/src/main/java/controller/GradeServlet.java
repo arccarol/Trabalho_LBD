@@ -61,6 +61,7 @@ public class GradeServlet extends HttpServlet {
         String cmd = request.getParameter("botao");
         String cursoCodigo = request.getParameter("curso");
         String disciplinaCodigo = request.getParameter("disciplina");
+        String codigo = request.getParameter("codigo");
 
         // saída
         String saida = "";
@@ -72,9 +73,7 @@ public class GradeServlet extends HttpServlet {
         List<Grade> grades = new ArrayList<>();
 
         if (!cmd.contains("Listar")) {
-        	Curso curso = new Curso();
-        	curso.setCodigo(Integer.parseInt(cursoCodigo));
-        	grade.setCurso(curso);
+        	grade.setCodigo(Integer.parseInt(codigo));
 
         }
 
@@ -92,6 +91,7 @@ public class GradeServlet extends HttpServlet {
                 Disciplina disciplina = new Disciplina();
                 disciplina.setCodigo(Integer.parseInt(disciplinaCodigo));
 
+                grade.getCodigo();
                 grade.setCurso(curso);
                 grade.setDisciplina(disciplina);
             }

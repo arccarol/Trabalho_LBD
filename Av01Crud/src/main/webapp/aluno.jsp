@@ -66,13 +66,6 @@
          </tr>
          <tr>
             <td class = "aluno" colspan="4">
-              <p class = "title">Telefone:</p>
-                <input class="cadastro" type="tel" id="telefone" name="telefone" 
-               value='<c:out value="${aluno.telefone }"></c:out>'> 
-            </td>
-         </tr>
-         <tr>
-            <td class = "aluno" colspan="4">
               <p class = "title">Data de Conclusão do 2° Grau:</p>
                 <input class="cadastro" type="date" id="conclusao_segundo_grau" name="conclusao_segundo_grau" 
                value='<c:out value="${aluno.conclusao_segundo_grau }"></c:out>'> 
@@ -161,6 +154,10 @@
             </td>
          </tr>
             </table>
+              <p class = "aviso">Cadastre seu Telefone logo após</p>
+              <div class= "link_telefone">
+              <li class = "telefone"><a href="${pageContext.request.contextPath}/telefone">Telefone</a></li>
+              </div>
               <p class = "aviso">Busque por seu CPF e obtenha seu RA e o Ano limite de Graduação</p>
        </form>
     </div>
@@ -190,7 +187,6 @@
                   <th>Nascimento</th>
                    <th>Email Pessoal</th>
                     <th>Email Corporativo</th>
-                    <th>Telefone</th>
                      <th>Data Conclusão 2°Grau</th>
                       <th>Instituição de Conclusão</th>
                        <th>Pontuação Vestibular</th>
@@ -213,7 +209,6 @@
             <td><c:out value ="${a.data_nascimento }"/></td>
              <td><c:out value ="${a.email_pessoal }"/></td>
               <td><c:out value ="${a.email_corporativo }"/></td>
-               <td><c:out value ="${a.telefone }"/></td>
                <td><c:out value ="${a.conclusao_segundo_grau }"/></td>
                 <td><c:out value ="${a.instituicao_conclusao }"/></td>
                  <td><c:out value ="${a.pontuacao_vestibular }"/></td>
@@ -362,7 +357,7 @@ form {
   margin-left: 30px;
   background-color:	#dcdcdc;
   width: 600px; 
-  height: 1100px;
+  height: 1150px;
   padding: 10px;
   border-radius: 30px; 
  }
@@ -441,6 +436,22 @@ select {
     height: 30px;
     border: 1px solid #C0C0C0; 
 
+}
+
+.telefone{
+    list-style: none;
+    font-weight: 600;
+    font-family: "Poppins";
+    font-size: 25px;
+
+}
+
+.link_telefone li a{
+	color: #5F9EA0;
+}
+
+.link_telefone li a:hover{
+	color: #191970;
 }
 
 

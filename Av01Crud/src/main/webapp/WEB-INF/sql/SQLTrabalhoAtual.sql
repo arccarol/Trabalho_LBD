@@ -630,7 +630,7 @@ AS
 BEGIN
     IF @opcao = 'I'
     BEGIN
-        -- Verifica se há alguma matrícula existente para o aluno e disciplina especificados
+       
         DECLARE @matriculaExistente BIT;
         SELECT @matriculaExistente = CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END
         FROM Matricula
@@ -642,7 +642,7 @@ BEGIN
         FROM Matricula
         WHERE aluno = @aluno AND disciplina = @disciplina AND nome_status != 'Reprovado';
 
-        -- Se não houver matrícula existente OU se todas as matrículas anteriores estiverem reprovadas, insere a nova matrícula
+       
         IF @matriculaExistente = 0 OR @todasReprovadas = 0
         BEGIN
             INSERT INTO Matricula (codigo, aluno, disciplina, data_m, nome_status)
@@ -652,13 +652,13 @@ BEGIN
         END
         ELSE
         BEGIN
-            -- Caso contrário, retorna uma mensagem indicando que o aluno já está matriculado e está cursando ou foi aprovado
+           
             SET @saida = 'O aluno já está matriculado nesta disciplina e está cursando ou foi aprovado.';
         END
     END
     ELSE IF @opcao = 'U'
     BEGIN
-        -- Atualiza a matrícula existente
+        
         UPDATE Matricula
         SET codigo = @codigo,
             aluno = @aluno,
@@ -671,7 +671,7 @@ BEGIN
     END
     ELSE IF @opcao = 'D'
     BEGIN
-        -- Exclui a matrícula especificada
+        
         DELETE FROM Matricula
         WHERE codigo = @codigo;
         
@@ -679,7 +679,7 @@ BEGIN
     END
     ELSE
     BEGIN
-        -- Opção inválida
+     
         SET @saida = 'Opção inválida.';
     END
 END;
@@ -697,6 +697,10 @@ PRINT @saida;
 
 
 select * from Matricula;
+
+
+-- CRUD TEEFONE 
+
 
 CREATE TABLE Telefone (
     codigo INT,
@@ -718,13 +722,13 @@ BEGIN
 
     IF @opcao = 'I'
     BEGIN
-        -- Verificar se o aluno com o CPF especificado existe na tabela Aluno
+   
         IF EXISTS (SELECT 1 FROM Aluno WHERE CPF = @cpfAluno)
         BEGIN
-            -- Verificar se o telefone já existe na tabela para este aluno
+       
             IF NOT EXISTS (SELECT 1 FROM Telefone WHERE telefone = @telefone AND aluno = @cpfAluno)
             BEGIN
-                -- Inserir um novo telefone associado ao aluno
+               
                 INSERT INTO Telefone (codigo, aluno, telefone)
                 VALUES (@codigo, @cpfAluno, @telefone);
                 
@@ -742,7 +746,7 @@ BEGIN
     END
     ELSE IF @opcao = 'D'
     BEGIN
-        -- Excluir um telefone associado ao aluno
+        
         DELETE FROM Telefone
         WHERE codigo = @codigo;
         
@@ -757,7 +761,7 @@ END;
 
 SELECT * from telefone
 
--- Chamada para inserir um novo telefone e associá-lo a um aluno
+
 DECLARE @saida VARCHAR(100);
 EXEC GerenciarTelefone 'D', 1, '91345626053', '11979669482', @saida OUTPUT;
 PRINT @saida;
